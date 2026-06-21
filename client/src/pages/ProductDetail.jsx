@@ -136,7 +136,11 @@ export default function ProductDetail() {
             </button>
           </div>
 
-          {!isMember && (
+          {isMember ? (
+            <div className="member-hint ok">
+              ✓ Your membership is active — download this and any product, unlimited.
+            </div>
+          ) : (
             <Link className="member-hint" to="/membership">
               🔒 Download requires an active membership — Get it for ₹499 →
             </Link>

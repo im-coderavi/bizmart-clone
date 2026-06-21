@@ -125,6 +125,11 @@ export const updateUser = asyncHandler(async (req, res) => {
 });
 
 // PUT /api/admin/users/:id/membership  { planId, durationDays? }  (manual upgrade)
+// PUT /api/admin/users/:id/membership
+// body: { planId, mode: "plan" | "lifetime" | "custom", days? }
+//   plan     -> use the plan's own durationDays (0 = lifetime)
+//   lifetime -> never expires
+//   custom   -> expires in `days` days
 export const upgradeUserMembership = asyncHandler(async (req, res) => {
   const Plan = (await import("../models/Plan.js")).default;
   const user = await User.findById(req.params.id);
@@ -132,9 +137,23 @@ export const upgradeUserMembership = asyncHandler(async (req, res) => {
   const plan = await Plan.findById(req.body.planId);
   if (!plan) return res.status(404).json({ message: "Plan not found" });
 
+  const mode = req.body.mode || "plan";
   let expiresAt = null;
-  if (plan.durationDays > 0)
-    expiresAt = new Date(Date.now() + plan.durationDays * 24 * 60 * 60 * 1000);
+  if (mode === "lifetime") {
+    expiresAt = null;
+  } else if (mode === "custom") {
+    const days = Number(req.body.days) || 0;
+    expiresAt = days > 0 ? new Date(Date.now() + days * 24 * 60 * 60 * 1000) : null;
+  } else {
+    // plan mode — extend from current expiry if still active, else from now
+    if (plan.durationDays > 0) {
+      const base =
+        user.membership?.isActive && user.membership.expiresAt > new Date()
+          ? new Date(user.membership.expiresAt)
+          : new Date();
+      expiresAt = new Date(base.getTime() + plan.durationDays * 24 * 60 * 60 * 1000);
+    }
+  }
 
   await Subscription.create({
     user: user._id,
@@ -145,7 +164,30 @@ export const upgradeUserMembership = asyncHandler(async (req, res) => {
   });
   user.membership = { isActive: true, plan: plan._id, expiresAt };
   await user.save();
+
+  // notify the user
+  const { sendEmail, templates } = await import("../utils/email.js");
+  sendEmail({
+    to: user.email,
+    ...templates.membershipActivated(user.name, plan.name, expiresAt),
+  }).catch(() => {});
+
   res.json({ message: "Membership granted", membership: user.membership });
+});
+
+// DELETE /api/admin/users/:id/membership  — revoke membership
+export const revokeUserMembership = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  await Subscription.updateMany(
+    { user: user._id, status: "active" },
+    { $set: { status: "cancelled" } }
+  );
+  user.membership = { isActive: false, plan: undefined, expiresAt: undefined };
+  await user.save();
+
+  res.json({ message: "Membership revoked" });
 });
 
 export const deleteUser = asyncHandler(async (req, res) => {

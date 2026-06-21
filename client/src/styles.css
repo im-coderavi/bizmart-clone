@@ -2451,3 +2451,69 @@ mark {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===================== Membership UI ===================== */
+.member-banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-bottom: 24px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+.member-banner.active {
+  background: linear-gradient(135deg, rgba(16, 242, 195, 0.14), rgba(85, 41, 237, 0.14));
+  border: 1px solid rgba(16, 242, 195, 0.4);
+}
+.member-banner.inactive {
+  background: rgba(106, 57, 255, 0.1);
+  border: 1px solid rgba(106, 57, 255, 0.35);
+}
+.mb-badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--cyan);
+  color: #04261f;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.mb-text {
+  flex: 1;
+  min-width: 200px;
+  color: #e7e5ef;
+}
+.mb-cta {
+  color: var(--purple-2);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.member-banner.active .mb-cta {
+  color: var(--cyan);
+}
+
+.member-hint.ok {
+  background: rgba(16, 242, 195, 0.1);
+  border-color: rgba(16, 242, 195, 0.4);
+  color: #7ff3da;
+}
+
+.membership-status .perk {
+  margin-top: 10px;
+  color: var(--cyan);
+  font-weight: 600;
+}
+
+/* admin membership modal current status line */
+.membership-current {
+  margin: 12px 0 16px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 14px;
+}
+.membership-current .badge-green {
+  margin-left: 4px;
+}

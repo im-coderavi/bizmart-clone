@@ -34,6 +34,7 @@ import {
   getUser,
   updateUser,
   upgradeUserMembership,
+  revokeUserMembership,
   deleteUser,
   listDownloads,
   listPayments,
@@ -92,6 +93,7 @@ router.get("/users", listUsers);
 router.get("/users/:id", getUser);
 router.put("/users/:id", updateUser);
 router.put("/users/:id/membership", upgradeUserMembership);
+router.delete("/users/:id/membership", revokeUserMembership);
 router.delete("/users/:id", deleteUser);
 
 // Downloads tracking

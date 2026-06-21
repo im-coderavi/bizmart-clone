@@ -48,6 +48,26 @@ export default function Dashboard() {
         <p>Manage your account, downloads and membership.</p>
       </div>
 
+      {m?.isActive ? (
+        <div className="member-banner active">
+          <span className="mb-badge">✓ ACTIVE MEMBER</span>
+          <span className="mb-text">
+            You can download <b>any product</b>, unlimited — themes, plugins & templates.
+            {m.isLifetime
+              ? " Lifetime access 🎉"
+              : m.daysRemaining != null
+              ? ` ${m.daysRemaining} day(s) left.`
+              : ""}
+          </span>
+          <Link to="/products" className="mb-cta">Browse products →</Link>
+        </div>
+      ) : (
+        <div className="member-banner inactive">
+          <span className="mb-text">🔒 You don't have an active membership — downloads are locked.</span>
+          <Link to="/membership" className="mb-cta">Get Membership ₹499 →</Link>
+        </div>
+      )}
+
       <div className="dash-cards">
         <div className="dash-card">
           <span className="dc-num">{data?.stats.downloads ?? 0}</span>
@@ -148,8 +168,19 @@ export default function Dashboard() {
               <div className="membership-status">
                 <p><b>Plan:</b> {m.plan?.name || "Premium"}</p>
                 <p><b>Status:</b> <span className="badge-green">Active</span></p>
-                <p><b>Expires:</b> {m.expiresAt ? new Date(m.expiresAt).toLocaleDateString() : "Lifetime — never expires"}</p>
-                {m.expiresAt && <Link className="btn-primary" to="/membership">Renew Membership</Link>}
+                <p>
+                  <b>Validity:</b>{" "}
+                  {m.isLifetime
+                    ? "Lifetime — never expires"
+                    : m.expiresAt
+                    ? `${new Date(m.expiresAt).toLocaleDateString()} (${m.daysRemaining} day(s) left)`
+                    : "—"}
+                </p>
+                <p><b>Total downloads:</b> {data?.stats.downloads ?? 0}</p>
+                <p className="perk">✓ Unlimited downloads on all {0 || ""}themes, plugins & templates</p>
+                {!m.isLifetime && m.expiresAt && (
+                  <Link className="btn-primary" to="/membership">Renew / Extend</Link>
+                )}
               </div>
             ) : (
               <div>

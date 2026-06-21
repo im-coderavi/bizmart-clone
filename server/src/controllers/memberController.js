@@ -80,6 +80,15 @@ export const myDashboard = asyncHandler(async (req, res) => {
       .lean(),
   ]);
 
+  const expiresAt = req.user.membership?.expiresAt || null;
+  let daysRemaining = null;
+  if (expiresAt) {
+    daysRemaining = Math.max(
+      0,
+      Math.ceil((new Date(expiresAt) - new Date()) / (24 * 60 * 60 * 1000))
+    );
+  }
+
   res.json({
     profile: {
       name: req.user.name,
@@ -90,7 +99,9 @@ export const myDashboard = asyncHandler(async (req, res) => {
     membership: {
       isActive: req.user.hasActiveMembership(),
       plan: subscription?.plan || null,
-      expiresAt: req.user.membership?.expiresAt || null,
+      expiresAt,
+      daysRemaining,
+      isLifetime: req.user.hasActiveMembership() && !expiresAt,
     },
     stats: {
       downloads: downloadCount,
