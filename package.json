@@ -1,0 +1,17 @@
+{
+  "name": "digital-marketplace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Digital Product Membership Marketplace (MERN) - client + server",
+  "scripts": {
+    "dev": "concurrently -n server,client -c magenta,cyan \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "start:server": "npm --prefix server start",
+    "seed": "npm --prefix server run seed",
+    "install:all": "npm --prefix server install && npm --prefix client install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
