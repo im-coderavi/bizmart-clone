@@ -11,6 +11,7 @@ function publicUser(u) {
     role: u.role,
     avatar: u.avatar,
     favorites: u.favorites,
+    purchasedProducts: u.purchasedProducts,
     membership: {
       isActive: u.hasActiveMembership(),
       plan: u.membership?.plan,

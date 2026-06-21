@@ -227,6 +227,7 @@ export const listPayments = asyncHandler(async (req, res) => {
     Payment.find(filter)
       .populate("user", "name email")
       .populate("plan", "name")
+      .populate("product", "name slug")
       .sort({ createdAt: -1 })
       .skip((pageNum - 1) * perPage)
       .limit(perPage)
@@ -245,10 +246,10 @@ export const refundPayment = asyncHandler(async (req, res) => {
   res.json({ message: "Payment marked as refunded" });
 });
 
-// PUT /api/admin/payments/:id/approve  — verify UPI/QR payment & activate membership
+// PUT /api/admin/payments/:id/approve  — verify UPI/QR payment
+// membership -> activate membership;  product -> grant product + email download link
 export const approvePayment = asyncHandler(async (req, res) => {
-  const { activateMembership } = await import("../utils/membership.js");
-  const payment = await Payment.findById(req.params.id).populate("plan");
+  const payment = await Payment.findById(req.params.id).populate("plan product");
   if (!payment) return res.status(404).json({ message: "Payment not found" });
   if (payment.status === "paid")
     return res.status(400).json({ message: "Payment already approved" });
@@ -262,8 +263,37 @@ export const approvePayment = asyncHandler(async (req, res) => {
   payment.reviewedAt = new Date();
   await payment.save();
 
-  await activateMembership(user, payment.plan, payment);
+  const { sendEmail, templates } = await import("../utils/email.js");
 
+  if (payment.kind === "product") {
+    const product = payment.product;
+    if (!product) return res.status(400).json({ message: "Product missing on payment" });
+
+    // grant access
+    if (!user.purchasedProducts.some((p) => String(p) === String(product._id))) {
+      user.purchasedProducts.push(product._id);
+      await user.save();
+    }
+    // bump download count
+    await Product.findByIdAndUpdate(product._id, { $inc: { downloadsCount: 1 } });
+
+    // email the download link the admin configured on the product
+    sendEmail({
+      to: user.email,
+      ...templates.productPurchased(
+        user.name,
+        product.name,
+        product.version,
+        product.downloadUrl
+      ),
+    }).catch(() => {});
+
+    return res.json({ message: "Product payment approved — download link emailed to user" });
+  }
+
+  // membership
+  const { activateMembership } = await import("../utils/membership.js");
+  await activateMembership(user, payment.plan, payment);
   res.json({ message: "Payment approved & membership activated" });
 });
 

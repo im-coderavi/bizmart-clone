@@ -3,7 +3,12 @@ import mongoose from "mongoose";
 const paymentSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    plan: { type: mongoose.Schema.Types.ObjectId, ref: "Plan", required: true },
+
+    // a payment is either for a membership plan OR a single product
+    kind: { type: String, enum: ["membership", "product"], default: "membership" },
+    plan: { type: mongoose.Schema.Types.ObjectId, ref: "Plan" },
+    product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+
     amount: { type: Number, required: true },
     currency: { type: String, default: "INR" },
     gateway: {

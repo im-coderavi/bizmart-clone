@@ -68,13 +68,16 @@ export default function AdminPayments() {
         <div className="table-wrap">
           <table className="data-table">
             <thead>
-              <tr><th>User</th><th>Plan</th><th>Amount</th><th>UTR</th><th>Proof</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+              <tr><th>User</th><th>Item</th><th>Amount</th><th>UTR</th><th>Proof</th><th>Status</th><th>Date</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {data.items.map((p) => (
                 <tr key={p._id}>
                   <td>{p.user?.name || "—"}<br /><small className="muted">{p.user?.email}</small></td>
-                  <td>{p.plan?.name || "—"}</td>
+                  <td>
+                    {p.kind === "product" ? p.product?.name : p.plan?.name || "—"}
+                    <br /><small className="muted">{p.kind === "product" ? "Single product" : "Membership"}</small>
+                  </td>
                   <td>₹{p.amount}</td>
                   <td>{p.utr || "—"}</td>
                   <td>

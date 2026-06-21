@@ -36,20 +36,24 @@ export default function ProductDetail() {
     if (user && product) setFav(user.favorites?.some((f) => String(f) === String(product._id)));
   }, [user, product]);
 
+  const owns = user?.purchasedProducts?.some((p) => String(p) === String(product?._id));
+  const canDownload = isMember || owns;
+
   const handleDownload = async () => {
     if (!isAuthed) return navigate("/login", { state: { from: `/product/${slug}` } });
+    // no access yet -> send to checkout (buy single product or membership)
+    if (!canDownload) return navigate(`/checkout/${slug}`);
+
     setDownloading(true);
     setMsg("");
     try {
       const { data } = await api.get(`/member/download/${product._id}`);
-      // trigger download
       window.open(data.url, "_blank");
       setMsg(`Downloading ${data.name} v${data.version}...`);
       setProduct((p) => ({ ...p, downloadsCount: p.downloadsCount + 1 }));
     } catch (err) {
-      if (err.needMembership) {
-        setMsg("You need an active membership to download. Redirecting...");
-        setTimeout(() => navigate("/membership"), 1200);
+      if (err.needMembership || err.needPurchase || err.response?.status === 403) {
+        navigate(`/checkout/${slug}`);
       } else {
         setMsg(err.uiMessage);
       }
@@ -124,7 +128,13 @@ export default function ProductDetail() {
 
           <div className="detail-actions">
             <button className="btn-primary" onClick={handleDownload} disabled={downloading}>
-              {downloading ? "Preparing..." : "⬇ Download"}
+              {downloading
+                ? "Preparing..."
+                : canDownload
+                ? "⬇ Download"
+                : product.price > 0
+                ? `⬇ Get this product — ₹${product.price}`
+                : "⬇ Download"}
             </button>
             {product.demoUrl && (
               <a className="btn-outline" href={product.demoUrl} target="_blank" rel="noreferrer">
@@ -136,13 +146,17 @@ export default function ProductDetail() {
             </button>
           </div>
 
-          {isMember ? (
+          {owns ? (
+            <div className="member-hint ok">
+              ✓ You own this product — download anytime.
+            </div>
+          ) : isMember ? (
             <div className="member-hint ok">
               ✓ Your membership is active — download this and any product, unlimited.
             </div>
           ) : (
-            <Link className="member-hint" to="/membership">
-              🔒 Download requires an active membership — Get it for ₹499 →
+            <Link className="member-hint" to={`/checkout/${slug}`}>
+              🔒 {product.price > 0 ? `Buy this product for ₹${product.price}` : "Membership required"} — or get a membership for unlimited downloads →
             </Link>
           )}
           {msg && <div className="detail-msg">{msg}</div>}

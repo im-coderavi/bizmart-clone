@@ -55,6 +55,17 @@ export const templates = {
     subject: "Payment verified — membership active ✅",
     html: `<h2>Hi ${name},</h2><p>Good news! Your payment of <b>₹${amount}</b> for <b>${planName}</b> has been verified and your membership is now <b>active</b>. You can now download unlimited products. Enjoy! 🎉</p>`,
   }),
+  productPurchased: (name, productName, version, downloadLink) => ({
+    subject: `Your download is ready — ${productName} ✅`,
+    html: `<h2>Hi ${name},</h2>
+      <p>Your payment has been verified. Thank you for purchasing <b>${productName}</b>${
+        version ? ` (v${version})` : ""
+      }.</p>
+      <p><b>Download link:</b><br/>
+      <a href="${downloadLink}" style="display:inline-block;margin-top:8px;padding:10px 18px;background:#5529ed;color:#fff;border-radius:6px;text-decoration:none">⬇ Download ${productName}</a></p>
+      <p style="color:#666;font-size:13px;margin-top:14px">Or copy this link: ${downloadLink}</p>
+      <p>You can also re-download it anytime from your dashboard.</p>`,
+  }),
   paymentRejected: (name, planName, reason) => ({
     subject: "Action needed on your payment ⚠️",
     html: `<h2>Hi ${name},</h2><p>We could not verify your recent payment for <b>${planName}</b>.${

@@ -2638,3 +2638,105 @@ mark {
     display: none;
   }
 }
+
+/* ===================== Checkout (single product) ===================== */
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 28px;
+  align-items: start;
+}
+.checkout-product {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--panel);
+}
+.checkout-product img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.checkout-product h3 {
+  margin: 0 0 4px;
+  font-size: 17px;
+}
+.co-price {
+  margin-top: 8px;
+  font-size: 30px;
+  font-weight: 900;
+}
+.checkout-pay {
+  padding: 22px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--panel);
+}
+.co-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ===================== Member banner / hints ===================== */
+.member-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 16px 18px;
+  margin-bottom: 24px;
+  border-radius: 12px;
+}
+.member-banner.active {
+  background: rgba(16, 242, 195, 0.1);
+  border: 1px solid rgba(16, 242, 195, 0.35);
+}
+.member-banner.inactive {
+  background: rgba(106, 57, 255, 0.1);
+  border: 1px solid rgba(106, 57, 255, 0.35);
+}
+.mb-badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--cyan);
+  color: #04231d;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.mb-text {
+  flex: 1;
+  min-width: 200px;
+  font-size: 14px;
+}
+.mb-cta {
+  color: var(--purple-2);
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.member-hint.ok {
+  background: rgba(16, 242, 195, 0.1);
+  border-color: rgba(16, 242, 195, 0.35);
+  color: var(--cyan);
+}
+.membership-current {
+  margin: 8px 0 16px;
+  font-size: 14px;
+}
+.membership-status .perk {
+  color: var(--cyan);
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .checkout-grid {
+    grid-template-columns: 1fr;
+  }
+}

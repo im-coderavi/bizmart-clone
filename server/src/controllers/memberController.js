@@ -3,11 +3,24 @@ import Download from "../models/Download.js";
 import Subscription from "../models/Subscription.js";
 import { asyncHandler } from "../utils/helpers.js";
 
-// GET /api/member/download/:productId  (membership required)
+// GET /api/member/download/:productId
+// Allowed if: admin, active membership, OR the user bought this product individually.
 export const downloadProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.productId);
   if (!product || product.status !== "published")
     return res.status(404).json({ message: "Product not found" });
+
+  const owns = req.user.purchasedProducts?.some(
+    (p) => String(p) === String(product._id)
+  );
+  const allowed =
+    req.user.role === "admin" || req.user.hasActiveMembership() || owns;
+
+  if (!allowed)
+    return res.status(403).json({
+      message: "Buy this product or get a membership to download",
+      needPurchase: true,
+    });
 
   if (!product.downloadUrl)
     return res.status(400).json({ message: "Download not available for this product yet" });

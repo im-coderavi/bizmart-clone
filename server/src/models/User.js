@@ -21,6 +21,9 @@ const userSchema = new mongoose.Schema(
 
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
 
+    // products bought individually (single-product purchase, not membership)
+    purchasedProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+
     resetPasswordToken: { type: String, select: false },
     resetPasswordExpire: { type: Date, select: false },
     lastLoginAt: { type: Date },
