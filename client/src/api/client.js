@@ -1,7 +1,10 @@
 import axios from "axios";
 
+// In dev, "/api" is proxied to the local server (see vite.config.js).
+// In production (Vercel), set VITE_API_URL to the backend URL, e.g.
+// https://your-backend.vercel.app/api
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: import.meta.env.VITE_API_URL || "/api",
 });
 
 // attach token from localStorage on every request
