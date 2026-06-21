@@ -10,6 +10,7 @@ const NAV = [
   { label: "Home", to: "/" },
   { label: "Themes", to: "/products?category=wordpress-themes" },
   { label: "Plugins", to: "/products?category=wordpress-plugins" },
+  { label: "Updates", to: "/updates" },
   { label: "Blog", to: "/blog" },
   { label: "Contact Us", to: "/contact" },
   { label: "Plans and Pricing", to: "/membership" },

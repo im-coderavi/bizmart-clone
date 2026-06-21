@@ -3,6 +3,7 @@ import {
   listProducts,
   suggestProducts,
   getProduct,
+  listUpdates,
 } from "../controllers/productController.js";
 import { listCategories } from "../controllers/categoryController.js";
 import { listPlans } from "../controllers/planController.js";
@@ -15,6 +16,7 @@ const router = Router();
 // Products
 router.get("/products", listProducts);
 router.get("/products/suggest", suggestProducts);
+router.get("/updates", listUpdates);
 router.get("/products/:slug", getProduct);
 
 // Categories

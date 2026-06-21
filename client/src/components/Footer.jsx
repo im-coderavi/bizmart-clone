@@ -44,6 +44,7 @@ export default function Footer() {
             { label: "Home", to: "/" },
             { label: "WP Themes", to: "/products?category=wordpress-themes" },
             { label: "WP Plugins", to: "/products?category=wordpress-plugins" },
+            { label: "Latest Updates", to: "/updates" },
             { label: "Blog", to: "/blog" },
             { label: "Membership", to: "/membership" },
             { label: "Contact Us", to: "/contact" },

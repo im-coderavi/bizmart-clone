@@ -79,6 +79,36 @@ export const suggestProducts = asyncHandler(async (req, res) => {
   res.json({ items });
 });
 
+// GET /api/updates  — latest added/updated products feed
+export const listUpdates = asyncHandler(async (req, res) => {
+  const limit = Math.min(60, Number(req.query.limit) || 40);
+  const items = await Product.find({ status: "published" })
+    .populate("category", "name slug")
+    .sort({ updatedAt: -1 })
+    .limit(limit)
+    .lean();
+
+  const feed = items.map((p) => {
+    // "new" if it hasn't been edited since creation (within 60s window)
+    const isNew = Math.abs(new Date(p.updatedAt) - new Date(p.createdAt)) < 60 * 1000;
+    const lastChange = p.changelog?.length ? p.changelog[p.changelog.length - 1] : null;
+    return {
+      _id: p._id,
+      name: p.name,
+      slug: p.slug,
+      thumbnail: p.thumbnail,
+      type: p.type,
+      category: p.category,
+      version: p.version,
+      updatedAt: p.updatedAt,
+      kind: isNew ? "new" : "updated",
+      note: lastChange?.notes || "",
+    };
+  });
+
+  res.json({ items: feed });
+});
+
 // GET /api/products/:slug
 export const getProduct = asyncHandler(async (req, res) => {
   const product = await Product.findOne({ slug: req.params.slug })

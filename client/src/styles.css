@@ -2517,3 +2517,124 @@ mark {
 .membership-current .badge-green {
   margin-left: 4px;
 }
+
+/* ===================== Latest Updates page ===================== */
+.upd-group {
+  margin-bottom: 30px;
+}
+.upd-day {
+  position: sticky;
+  top: 76px;
+  display: inline-block;
+  margin: 0 0 14px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(106, 57, 255, 0.18);
+  border: 1px solid rgba(106, 57, 255, 0.35);
+  font-size: 13px;
+  font-weight: 700;
+  color: #c7b3ff;
+}
+.upd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-left: 2px solid rgba(255, 255, 255, 0.08);
+  padding-left: 22px;
+}
+.upd-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--panel);
+  transition: transform 150ms ease, border-color 150ms ease;
+}
+.upd-item:hover {
+  transform: translateX(3px);
+  border-color: rgba(106, 57, 255, 0.5);
+}
+.upd-dot {
+  position: absolute;
+  left: -29px;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  box-shadow: 0 0 0 4px var(--bg);
+}
+.upd-dot.new {
+  background: var(--cyan);
+}
+.upd-dot.updated {
+  background: var(--purple-2);
+}
+.upd-item img {
+  width: 96px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.upd-body {
+  flex: 1;
+  min-width: 0;
+}
+.upd-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.upd-top h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.upd-tag {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+.upd-tag.new {
+  background: rgba(16, 242, 195, 0.16);
+  color: var(--cyan);
+}
+.upd-tag.updated {
+  background: rgba(106, 57, 255, 0.22);
+  color: #c7b3ff;
+}
+.upd-meta {
+  display: flex;
+  gap: 14px;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+.upd-note {
+  margin: 6px 0 0;
+  color: #cfccda;
+  font-size: 13px;
+  font-style: italic;
+}
+.upd-go {
+  color: var(--purple-2);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+@media (max-width: 560px) {
+  .upd-item img {
+    display: none;
+  }
+  .upd-go {
+    display: none;
+  }
+}
