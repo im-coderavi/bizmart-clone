@@ -119,6 +119,19 @@ export default function ProductDetail() {
           </div>
           <p className="detail-short">{product.shortDescription}</p>
 
+          <div className="detail-price">
+            {product.price > 0 ? (
+              <>
+                <span className="dp-amount">₹{product.price.toLocaleString("en-IN")}</span>
+                <span className="dp-note">one-time · single product</span>
+                <span className="dp-or">or</span>
+                <Link to="/membership" className="dp-member">Membership — unlimited ₹499</Link>
+              </>
+            ) : (
+              <span className="dp-included">✓ Included with Membership</span>
+            )}
+          </div>
+
           <ul className="quick-facts">
             <li><b>Version</b> {product.version}</li>
             <li><b>Last Updated</b> {new Date(product.updatedAt).toLocaleDateString()}</li>

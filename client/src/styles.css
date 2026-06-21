@@ -2740,3 +2740,50 @@ mark {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===================== Product price display ===================== */
+.detail-price {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 4px;
+}
+.dp-amount {
+  font-size: 30px;
+  font-weight: 900;
+  color: #fff;
+}
+.dp-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+.dp-or {
+  color: var(--muted);
+  font-size: 13px;
+}
+.dp-member {
+  color: var(--purple-2);
+  font-weight: 700;
+  font-size: 14px;
+}
+.dp-included {
+  color: var(--cyan);
+  font-weight: 700;
+  font-size: 16px;
+}
+.pc-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: auto;
+}
+.pc-foot .pc-link {
+  margin: 0;
+}
+.pc-price {
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+}

@@ -189,8 +189,8 @@ export default function AdminProductForm() {
           </label>
 
           <label>
-            Price (0 = membership only)
-            <input type="number" value={form.price} onChange={set("price")} />
+            Single Price ₹ (0 = membership only)
+            <input type="number" min="0" value={form.price} onChange={set("price")} placeholder="e.g. 199" />
           </label>
 
           <label>
