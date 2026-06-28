@@ -2,6 +2,7 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import { connectDB } from "./config/db.js";
 import { uniqueSlug } from "./utils/helpers.js";
+import { richDescription, richShort } from "./utils/productCopy.js";
 
 import User from "./models/User.js";
 import Category from "./models/Category.js";
@@ -205,8 +206,8 @@ async function run() {
       type,
       thumbnail: image,
       screenshots: [image],
-      shortDescription: `${name} — premium GPL ${type.toLowerCase()} available with membership.`,
-      description: `<p>${name} is a top-rated ${type.toLowerCase()} included free with your membership. Download the latest version with unlimited updates.</p>`,
+      shortDescription: richShort(name, type),
+      description: richDescription(name, type),
       features: [
         "Latest version",
         "100% Genuine GPL",

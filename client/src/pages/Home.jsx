@@ -4,7 +4,7 @@ import api from "../api/client.js";
 import SearchBar from "../components/SearchBar.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import Mascot from "../components/Mascot.jsx";
-import { ArrowIcon, CheckLine } from "../components/Icons.jsx";
+import { ArrowIcon, CheckLine, BoltIcon } from "../components/Icons.jsx";
 import Loader from "../components/Loader.jsx";
 
 function HighlightText({ text }) {
@@ -54,14 +54,6 @@ export default function Home() {
 
   return (
     <>
-      <section className="promo-strip">
-        <strong>DOWNLOAD EVERYTHING AT JUST ₹{plan?.price ?? 499}</strong>
-        <span>Get Lifetime Validity</span>
-        <Link to="/membership">
-          Start now <ArrowIcon />
-        </Link>
-      </section>
-
       <section className="hero">
         <div className="hero-copy">
           <h1>
@@ -102,14 +94,14 @@ export default function Home() {
       </section>
 
       <section className="pricing">
-        <h2>Get Everything in 1 subscription</h2>
-        <div className="pricing-layout">
-          <div className="benefit-box">
-            <h3>What you will get in this subscription of ₹{plan?.price ?? 499} 👇</h3>
+        <h2 className="section-title">Get Everything in 1 subscription</h2>
+        <div className="get-layout">
+          <div className="whatyouget">
+            <h2>What you will get in this subscription of ₹{plan?.price ?? 499} 👇</h2>
             <ul>
               {benefits.map((b) => (
                 <li key={b}>
-                  <span>✓</span>
+                  <span className="wy-check">✓</span>
                   <HighlightText text={b} />
                 </li>
               ))}
@@ -117,32 +109,33 @@ export default function Home() {
           </div>
 
           {plan && (
-            <aside className="plan-card">
-              <div className="popular">MOST POPULAR</div>
-              <div className="plan-inner">
-                <div className="bolt">ϟ</div>
-                <h3>{plan.name}</h3>
-                <p>{plan.description || "Best value for money"}</p>
-                <div className="save-row">
-                  {plan.originalPrice > 0 && <span className="old-price">₹{plan.originalPrice}</span>}
-                  {plan.originalPrice > 0 && (
-                    <span className="save">
-                      SAVE {Math.round((1 - plan.price / plan.originalPrice) * 100)}%
-                    </span>
-                  )}
+            <aside className="get-aside">
+              <div className="pricing-card popular">
+                <div className="popular-head">MOST POPULAR</div>
+                <div className="plan-body">
+                  <div className="plan-ico"><BoltIcon /></div>
+                  <h3>{plan.name}</h3>
+                  <p className="plan-desc">{plan.description || "Best value for money"}</p>
+                  <div className="plan-pricing">
+                    {plan.originalPrice > 0 && <s>₹{plan.originalPrice}</s>}
+                    {plan.originalPrice > 0 && (
+                      <span className="save-tag">
+                        SAVE {Math.round((1 - plan.price / plan.originalPrice) * 100)}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="plan-price">
+                    <span className="cur">₹</span>{plan.price}
+                  </div>
+                  <Link className="btn-primary full" to="/membership">
+                    SELECT PLAN
+                  </Link>
+                  <ul className="plan-feats">
+                    {plan.features.map((f) => (
+                      <li key={f}>✓ {f}</li>
+                    ))}
+                  </ul>
                 </div>
-                <div className="price">
-                  <small>₹</small>
-                  {plan.price.toFixed(2)}
-                </div>
-                <Link className="select-plan" to="/membership">
-                  SELECT PLAN
-                </Link>
-                <ul>
-                  {plan.features.map((f) => (
-                    <li key={f}>✓ {f}</li>
-                  ))}
-                </ul>
               </div>
             </aside>
           )}

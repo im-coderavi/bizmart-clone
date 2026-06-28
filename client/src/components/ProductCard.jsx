@@ -17,9 +17,6 @@ export default function ProductCard({ product }) {
         )}
       </div>
       <div className="pc-foot">
-        <span className="pc-price">
-          {product.price > 0 ? `₹${product.price.toLocaleString("en-IN")}` : "Membership"}
-        </span>
         <Link className="pc-link" to={`/product/${product.slug}`}>
           Download Now »
         </Link>

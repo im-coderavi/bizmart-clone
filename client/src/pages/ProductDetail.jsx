@@ -5,44 +5,61 @@ import { useAuth } from "../context/AuthContext.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import Loader from "../components/Loader.jsx";
 
+const PERKS = [
+  "Access to 5000+ Premium WordPress Themes and Plugins",
+  "Download anything you want",
+  "Lifetime Validity & Future Updates",
+  "Use it on Multiple Websites",
+  "30 Days Money Back Guarantee",
+];
+
 export default function ProductDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { isAuthed, isMember, user, refreshUser } = useAuth();
+  const { isAuthed, isMember } = useAuth();
 
   const [product, setProduct] = useState(null);
-  const [related, setRelated] = useState([]);
-  const [activeImg, setActiveImg] = useState("");
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [msg, setMsg] = useState("");
-  const [fav, setFav] = useState(false);
+
+  // Explore section (paginated, 12 per page)
+  const [explore, setExplore] = useState([]);
+  const [exPage, setExPage] = useState(1);
+  const [exPages, setExPages] = useState(1);
 
   useEffect(() => {
     setLoading(true);
     setMsg("");
+    window.scrollTo(0, 0);
     api
       .get(`/products/${slug}`)
-      .then((r) => {
-        setProduct(r.data.product);
-        setRelated(r.data.related);
-        setActiveImg(r.data.product.thumbnail || r.data.product.screenshots?.[0] || "");
-      })
+      .then((r) => setProduct(r.data.product))
       .catch(() => setProduct(null))
       .finally(() => setLoading(false));
   }, [slug]);
 
   useEffect(() => {
-    if (user && product) setFav(user.favorites?.some((f) => String(f) === String(product._id)));
-  }, [user, product]);
+    setExPage(1);
+  }, [slug]);
 
-  const owns = user?.purchasedProducts?.some((p) => String(p) === String(product?._id));
-  const canDownload = isMember || owns;
+  useEffect(() => {
+    if (!product) return;
+    api
+      .get("/products", { params: { limit: 12, page: exPage } })
+      .then((r) => {
+        setExplore((r.data.items || []).filter((p) => p._id !== product._id));
+        setExPages(r.data.pages || 1);
+      })
+      .catch(() => {});
+  }, [product, exPage]);
+
+  // Download is members-only. No single-product purchase.
+  const canDownload = isMember;
 
   const handleDownload = async () => {
     if (!isAuthed) return navigate("/login", { state: { from: `/product/${slug}` } });
-    // no access yet -> send to checkout (buy single product or membership)
-    if (!canDownload) return navigate(`/checkout/${slug}`);
+    if (!canDownload) return navigate("/membership");
 
     setDownloading(true);
     setMsg("");
@@ -53,23 +70,12 @@ export default function ProductDetail() {
       setProduct((p) => ({ ...p, downloadsCount: p.downloadsCount + 1 }));
     } catch (err) {
       if (err.needMembership || err.needPurchase || err.response?.status === 403) {
-        navigate(`/checkout/${slug}`);
+        navigate("/membership");
       } else {
         setMsg(err.uiMessage);
       }
     } finally {
       setDownloading(false);
-    }
-  };
-
-  const toggleFav = async () => {
-    if (!isAuthed) return navigate("/login");
-    try {
-      await api.post(`/member/favorites/${product._id}`);
-      setFav((f) => !f);
-      refreshUser();
-    } catch {
-      /* ignore */
     }
   };
 
@@ -81,99 +87,60 @@ export default function ProductDetail() {
       </div>
     );
 
-  const gallery = [product.thumbnail, ...(product.screenshots || [])].filter(Boolean);
+  const heroImg = product.thumbnail || product.screenshots?.[0] || "";
 
   return (
     <div className="page-wrap detail-page">
+      <nav className="crumb">
+        <Link to="/">⌂ Home</Link>
+        <span>»</span>
+        <Link to={`/products?type=${encodeURIComponent(product.type || "")}`}>{product.type || "Products"}</Link>
+        <span>»</span>
+        <span className="crumb-current">{product.name}</span>
+      </nav>
+
       <div className="detail-top">
-        <div className="detail-gallery">
-          <div className="main-img">
-            <img src={activeImg} alt={product.name} />
+        <div className="detail-left">
+          <div className="title-card">
+            <h1>{product.name}</h1>
           </div>
-          {gallery.length > 1 && (
-            <div className="thumbs">
-              {gallery.map((g, i) => (
-                <button
-                  key={i}
-                  className={activeImg === g ? "active" : ""}
-                  onClick={() => setActiveImg(g)}
-                >
-                  <img src={g} alt="" />
-                </button>
-              ))}
-            </div>
-          )}
+
+          <div className="hero-img">
+            <img src={heroImg} alt={product.name} />
+          </div>
         </div>
 
-        <div className="detail-info">
-          <div className="detail-badges">
-            <span className="tag">{product.category?.name}</span>
-            <span className="tag">{product.type}</span>
-            {product.membershipRequired && <span className="tag member">Membership</span>}
-          </div>
-          <h1>{product.name}</h1>
-          <div className="detail-meta">
-            <span>★ {product.ratingAvg?.toFixed(1) || "0.0"} ({product.ratingCount} reviews)</span>
-            <span>{product.downloadsCount?.toLocaleString()} downloads</span>
-            <span>v{product.version}</span>
-          </div>
-          <p className="detail-short">{product.shortDescription}</p>
-
-          <div className="detail-price">
-            {product.price > 0 ? (
-              <>
-                <span className="dp-amount">₹{product.price.toLocaleString("en-IN")}</span>
-                <span className="dp-note">one-time · single product</span>
-                <span className="dp-or">or</span>
-                <Link to="/membership" className="dp-member">Membership — unlimited ₹499</Link>
-              </>
-            ) : (
-              <span className="dp-included">✓ Included with Membership</span>
-            )}
-          </div>
-
-          <ul className="quick-facts">
-            <li><b>Version</b> {product.version}</li>
-            <li><b>Last Updated</b> {new Date(product.updatedAt).toLocaleDateString()}</li>
-            <li><b>File Size</b> {product.fileSize || "—"}</li>
-            <li><b>License</b> GPL</li>
+        <aside className="buy-card">
+          <h2 className="buy-title">Unlimited downloads for Lifetime at just ₹499</h2>
+          <ul className="buy-perks">
+            {PERKS.map((p) => (
+              <li key={p}><span className="bp-check">✓</span> {p}</li>
+            ))}
           </ul>
 
-          <div className="detail-actions">
-            <button className="btn-primary" onClick={handleDownload} disabled={downloading}>
+          <button className="subscribe-btn shine" onClick={handleDownload} disabled={downloading}>
+            <span className="sb-label">
               {downloading
                 ? "Preparing..."
                 : canDownload
-                ? "⬇ Download"
-                : product.price > 0
-                ? `⬇ Get this product — ₹${product.price}`
-                : "⬇ Download"}
-            </button>
-            {product.demoUrl && (
-              <a className="btn-outline" href={product.demoUrl} target="_blank" rel="noreferrer">
-                Live Demo
-              </a>
-            )}
-            <button className="btn-icon" onClick={toggleFav} title="Save">
-              {fav ? "♥" : "♡"}
-            </button>
-          </div>
+                ? "⬇ Download Now"
+                : "⬇ Subscribe to download"}
+            </span>
+          </button>
 
-          {owns ? (
-            <div className="member-hint ok">
-              ✓ You own this product — download anytime.
-            </div>
-          ) : isMember ? (
-            <div className="member-hint ok">
-              ✓ Your membership is active — download this and any product, unlimited.
-            </div>
+          {canDownload ? (
+            <div className="buy-note ok">✓ Your membership is active — download this & any product, unlimited.</div>
           ) : (
-            <Link className="member-hint" to={`/checkout/${slug}`}>
-              🔒 {product.price > 0 ? `Buy this product for ₹${product.price}` : "Membership required"} — or get a membership for unlimited downloads →
-            </Link>
+            <div className="buy-note">🔒 Membership required to download. Get lifetime access at ₹499.</div>
           )}
           {msg && <div className="detail-msg">{msg}</div>}
-        </div>
+
+          <div className="buy-meta">
+            <span>★ {product.ratingAvg?.toFixed(1) || "0.0"}</span>
+            <span>{product.downloadsCount?.toLocaleString()} downloads</span>
+            <span>v{product.version}</span>
+          </div>
+        </aside>
       </div>
 
       <div className="detail-body">
@@ -209,14 +176,25 @@ export default function ProductDetail() {
         )}
       </div>
 
-      {related.length > 0 && (
-        <div className="related">
-          <h2>Related Products</h2>
+      {explore.length > 0 && (
+        <div className="related explore-block">
+          <div className="explore-head">
+            <h2>Explore Some Popular {product.type ? `${product.type}s` : "Products"}</h2>
+          </div>
           <div className="catalog-grid">
-            {related.map((p) => (
+            {explore.map((p) => (
               <ProductCard product={p} key={p._id} />
             ))}
           </div>
+          {exPages > 1 && (
+            <div className="pagination explore-pagination">
+              <button disabled={exPage === 1} onClick={() => { setExPage((n) => n - 1); window.scrollTo({ top: document.querySelector(".explore-block")?.offsetTop - 80, behavior: "smooth" }); }}>‹ Prev</button>
+              {Array.from({ length: exPages }, (_, i) => i + 1).map((n) => (
+                <button key={n} className={n === exPage ? "active" : ""} onClick={() => { setExPage(n); window.scrollTo({ top: document.querySelector(".explore-block")?.offsetTop - 80, behavior: "smooth" }); }}>{n}</button>
+              ))}
+              <button disabled={exPage === exPages} onClick={() => { setExPage((n) => n + 1); window.scrollTo({ top: document.querySelector(".explore-block")?.offsetTop - 80, behavior: "smooth" }); }}>Next ›</button>
+            </div>
+          )}
         </div>
       )}
     </div>

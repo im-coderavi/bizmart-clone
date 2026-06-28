@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-import SearchBar from "./SearchBar.jsx";
 
 const logo =
   "https://app.blizmatt.com/wp-content/uploads/2025/03/Blizmatt-Digital-300x78.png.webp";
@@ -10,8 +9,7 @@ const NAV = [
   { label: "Home", to: "/" },
   { label: "Themes", to: "/products?category=wordpress-themes" },
   { label: "Plugins", to: "/products?category=wordpress-plugins" },
-  { label: "Updates", to: "/updates" },
-  { label: "Blog", to: "/blog" },
+  { label: "Reviews", to: "/membership#reviews" },
   { label: "Contact Us", to: "/contact" },
   { label: "Plans and Pricing", to: "/membership" },
 ];
@@ -34,10 +32,6 @@ export default function Header() {
       <Link className="brand" to="/" aria-label="Home">
         <img src={logo} alt="Digital Marketplace" />
       </Link>
-
-      <div className="header-search">
-        <SearchBar />
-      </div>
 
       <nav className={menuOpen ? "nav-open" : ""} onClick={() => setMenuOpen(false)}>
         {NAV.map((item) => (
